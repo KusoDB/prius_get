@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.toyota.jp)",
+      "WebFetch(domain:toyota.jp)",
+      "WebFetch(domain:gazoo.com)",
+      "Bash(python test:*)"
+    ],
+    "deny": []
+  }
+}
