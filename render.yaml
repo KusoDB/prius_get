@@ -1,0 +1,27 @@
+# Render.com デプロイ設定
+services:
+  - type: web
+    name: prius-monitor
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt && playwright install chromium"
+    startCommand: "python cloud_monitor.py"
+    envVars:
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: SMTP_SERVER
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: TO_EMAIL
+        sync: false
+    schedule:
+      # 30分ごとに実行（cron形式）
+      - name: prius-check
+        schedule: "*/30 * * * *"
+        command: "python cloud_monitor.py"

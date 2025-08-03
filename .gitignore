@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+venv/
+ENV/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Data files (but keep backup files for cloud persistence)
+data/
+!vehicles_backup.json
+!monitor_latest.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Screenshots and debug files
+*.png
+*.html
+current_search_result.*
+toyota_page.*
+actual_search_result.*
+
+# Logs (except latest for cloud)
+*.log
+!monitor_latest.log
+
+# Temporary files
+*.tmp
+*.temp
