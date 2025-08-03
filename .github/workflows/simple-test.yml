@@ -1,0 +1,22 @@
+name: Simple Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: List files
+      run: |
+        echo "Repository contents:"
+        ls -la
+        echo "Workflow files:"
+        ls -la .github/workflows/
+    - name: Test Python
+      run: |
+        python3 --version
+        echo "✅ GitHub Actions is working!"

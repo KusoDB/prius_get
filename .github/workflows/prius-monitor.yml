@@ -1,4 +1,4 @@
-name: プリウス監視システム
+name: Prius Monitor System
 
 on:
   schedule:
