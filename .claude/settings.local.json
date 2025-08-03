@@ -5,7 +5,8 @@
       "WebFetch(domain:toyota.jp)",
       "WebFetch(domain:gazoo.com)",
       "Bash(python test:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
