@@ -1,4 +1,4 @@
-name: Prius Monitor
+  name: Prius Monitor
 
   on:
     schedule:
