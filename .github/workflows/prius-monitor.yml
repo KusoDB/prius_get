@@ -1,0 +1,51 @@
+name: Prius Monitor
+
+  on:
+    schedule:
+      - cron: '*/30 * * * *'
+    workflow_dispatch:
+
+  jobs:
+    monitor:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright beautifulsoup4 python-dotenv requests
+          playwright install chromium
+
+      - name: Restore data
+        run: |
+          mkdir -p data
+          if [ -f "vehicles_backup.json" ]; then
+            cp vehicles_backup.json data/vehicles.json
+          fi
+
+      - name: Run monitor
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python cloud_monitor.py
+
+      - name: Backup data
+        run: |
+          if [ -f "data/vehicles.json" ]; then
+            cp data/vehicles.json vehicles_backup.json
+          fi
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add vehicles_backup.json
+          if ! git diff --staged --quiet; then
+            git commit -m "🤖 Data update $(date)"
+            git push
+          fi
