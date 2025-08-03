@@ -257,11 +257,12 @@ class CloudPriusMonitor:
         if len(current_vehicles) > 5:
             self.log(f"  ... 他{len(current_vehicles)-5}台")
         
-        # ステータス通知（1日1回程度に制限）
-        current_hour = datetime.now().hour
-        if current_hour == 9:  # 日本時間18時頃
+        # 週1回のサマリー通知（日曜日の18時のみ）
+        current_time = datetime.now()
+        if current_time.weekday() == 6 and current_time.hour == 9:  # 日曜日の18時（JST）
+            summary_message = f"📊 週間サマリー\n監視中のプリウス: {len(self.known_vehicles)}台\n今週の新着: 0台（新着があった場合は個別通知済み）"
             if self.send_slack_notification([], is_status=True):
-                self.log("✅ ステータス通知送信完了")
+                self.log("✅ 週間サマリー送信完了")
         
         self.log("=== プリウス監視システム完了 ===")
         return len(new_vehicles)
