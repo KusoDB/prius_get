@@ -1,41 +1,39 @@
-name: Prius Monitor System
+name: Prius Monitor
 
 on:
   schedule:
-    # 30分ごとに実行 (UTC時間)
     - cron: '*/30 * * * *'
-  workflow_dispatch: # 手動実行も可能
+  workflow_dispatch:
 
 jobs:
-  monitor-prius:
+  monitor:
     runs-on: ubuntu-latest
     
     steps:
-    - name: チェックアウト
+    - name: Checkout
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Python環境セットアップ
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
         
-    - name: 依存関係インストール
+    - name: Install dependencies
       run: |
         pip install playwright beautifulsoup4 python-dotenv requests
         playwright install chromium
         
-    - name: 既存データ復元
+    - name: Restore data
       run: |
         mkdir -p data
-        # 前回のデータがあれば復元
         if [ -f "vehicles_backup.json" ]; then
           cp vehicles_backup.json data/vehicles.json
-          echo "既存データを復元しました"
+          echo "Data restored"
         fi
         
-    - name: プリウス監視実行
+    - name: Run Prius monitor
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
@@ -46,37 +44,34 @@ jobs:
       run: |
         python cloud_monitor.py
         
-    - name: データバックアップ
+    - name: Backup data
       run: |
-        # 検出データをリポジトリルートにバックアップ
         if [ -f "data/vehicles.json" ]; then
           cp data/vehicles.json vehicles_backup.json
         fi
-        
-        # ログの最新部分を保存（ファイルサイズ制限対策）
         if [ -f "data/monitor.log" ]; then
           tail -n 100 data/monitor.log > monitor_latest.log
         fi
         
-    - name: 変更をコミット
+    - name: Commit changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add vehicles_backup.json monitor_latest.log
         if git diff --staged --quiet; then
-          echo "変更なし"
+          echo "No changes"
         else
-          git commit -m "🤖 プリウス監視データ更新 $(date '+%Y-%m-%d %H:%M:%S')"
+          git commit -m "Update monitoring data $(date '+%Y-%m-%d %H:%M:%S')"
           git push
         fi
 
-    - name: 実行結果をSlackに通知（エラー時）
+    - name: Notify on failure
       if: failure()
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       run: |
         if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
           curl -X POST -H 'Content-type: application/json' \
-            --data '{"text":"⚠️ プリウス監視システムでエラーが発生しました。GitHubアクションのログを確認してください。"}' \
+            --data '{"text":"⚠️ Prius monitoring system error. Check GitHub Actions logs."}' \
             $SLACK_WEBHOOK_URL
         fi
