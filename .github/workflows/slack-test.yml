@@ -1,39 +1,21 @@
-  name: Slack Test
+  name: Slack Test Simple
 
   on:
     workflow_dispatch:
 
   jobs:
-    test-slack:
+    test:
       runs-on: ubuntu-latest
       steps:
-      - name: Check Slack Webhook URL
+      - name: Test Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           if [ -z "$SLACK_WEBHOOK_URL" ]; then
-            echo "❌ SLACK_WEBHOOK_URL is not set in GitHub Secrets"
-            echo "Please add it in Settings → Secrets and variables → Actions"
-            exit 1
+            echo "❌ Webhook URL not set"
           else
-            echo "✅ SLACK_WEBHOOK_URL is configured"
-            echo "URL length: ${#SLACK_WEBHOOK_URL} characters"
-          fi
-
-      - name: Send test notification
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          echo "Sending test notification to Slack..."
-          curl -X POST -H 'Content-type: application/json' \
-            --data '{"text":"🧪 **GitHub Actions Slack テスト成功！**\n\n✅ 
-  プリウス監視システムの通知機能が正常に動作しています。\n⏰ テスト実行時刻: 
-  '"$(date)"'"}' \
-            $SLACK_WEBHOOK_URL
-
-          if [ $? -eq 0 ]; then
-            echo "✅ Slack notification sent successfully!"
-          else
-            echo "❌ Failed to send Slack notification"
-            exit 1
+            echo "✅ Sending test message..."
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"🧪 GitHub Actions テスト成功！"}' \
+              $SLACK_WEBHOOK_URL
           fi
