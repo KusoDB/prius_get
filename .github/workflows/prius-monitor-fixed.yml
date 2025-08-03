@@ -1,4 +1,4 @@
-name: Prius Monitor Fixed
+name: Prius Monitor
 
 on:
   schedule:

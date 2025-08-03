@@ -6,7 +6,10 @@
       "WebFetch(domain:gazoo.com)",
       "Bash(python test:*)",
       "Bash(git checkout:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git branch:*)",
+      "Bash(git stash:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
