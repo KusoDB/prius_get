@@ -1,0 +1,102 @@
+name: Prius Monitor Fixed
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install playwright beautifulsoup4 python-dotenv requests
+        playwright install chromium
+        
+    - name: Restore data
+      run: |
+        mkdir -p data
+        if [ -f "vehicles_backup.json" ]; then
+          cp vehicles_backup.json data/vehicles.json
+          echo "Data restored from backup"
+        else
+          echo "No backup data found, starting fresh"
+        fi
+        
+    - name: Run Prius monitor
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        echo "Starting Prius monitoring..."
+        if [ -f "cloud_monitor.py" ]; then
+          python cloud_monitor.py
+        else
+          echo "cloud_monitor.py not found!"
+          ls -la *.py
+          exit 1
+        fi
+        
+    - name: Backup data
+      run: |
+        if [ -f "data/vehicles.json" ]; then
+          cp data/vehicles.json vehicles_backup.json
+          echo "Data backed up successfully"
+        else
+          echo "No data file to backup"
+        fi
+        
+    - name: Commit changes (safe)
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if there are any changes
+        if [ -f "vehicles_backup.json" ]; then
+          git add vehicles_backup.json || echo "Failed to add vehicles_backup.json"
+        fi
+        
+        # Only commit if there are staged changes
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          echo "Committing changes..."
+          git commit -m "🤖 Update monitoring data $(date '+%Y-%m-%d %H:%M')" || echo "Commit failed but continuing"
+          git push || echo "Push failed but monitoring completed successfully"
+        fi
+
+    - name: Report success
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        echo "✅ Monitoring completed successfully"
+        if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+          curl -s -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ プリウス監視システム正常動作確認"}' \
+            $SLACK_WEBHOOK_URL || echo "Slack notification failed"
+        fi
+
+    - name: Notify on failure
+      if: failure()
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        if [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+          curl -s -X POST -H 'Content-type: application/json' \
+            --data '{"text":"⚠️ プリウス監視システムでエラーが発生しました。詳細をGitHub Actionsで確認してください。"}' \
+            $SLACK_WEBHOOK_URL
+        fi
