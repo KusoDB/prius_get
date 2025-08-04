@@ -26,5 +26,12 @@
     "is_new": false,
     "detected_at": "2025-08-03T12:19:57.756920",
     "search_url": "https://toyota.jp/ucar/carlist/?Tval=1&chk-detail-tvalue-sp-check=1&Cn=01_プリウス&Ymn=2019&Drv=2&Pmx=160"
+  },
+  "f99d00b6": {
+    "name": "プリウス S",
+    "price": "138万円",
+    "is_new": false,
+    "detected_at": "2025-08-04T03:06:07.268914",
+    "search_url": "https://toyota.jp/ucar/carlist/?Tval=1&chk-detail-tvalue-sp-check=1&Cn=01_プリウス&Ymn=2019&Drv=2&Pmx=160"
   }
 }
