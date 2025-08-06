@@ -33,5 +33,12 @@
     "is_new": false,
     "detected_at": "2025-08-04T03:06:07.268914",
     "search_url": "https://toyota.jp/ucar/carlist/?Tval=1&chk-detail-tvalue-sp-check=1&Cn=01_プリウス&Ymn=2019&Drv=2&Pmx=160"
+  },
+  "6bafb36f": {
+    "name": "プリウス A プレミアムツーリング",
+    "price": "136万円",
+    "is_new": false,
+    "detected_at": "2025-08-06T23:39:26.644713",
+    "search_url": "https://toyota.jp/ucar/carlist/?Tval=1&chk-detail-tvalue-sp-check=1&Cn=01_プリウス&Ymn=2019&Drv=2&Pmx=160"
   }
 }
